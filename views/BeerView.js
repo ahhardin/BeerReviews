@@ -5,8 +5,14 @@ var BeerView = Backbone.View.extend({
   template: Handlebars.compile($('#beer-template').html()),
 
   events: {
-    'click .beer-name': 'makeEditable'
-  }
+    'click .edit': 'editMode',
+    'keypress .beer-name': 'submitOnEnter',
+    'click .remove' : 'deleteMe'
+  },
+
+  initialize: function( ){
+    this.listenTo(this.model,'destroy',this.remove)
+  },
 
   render: function () {
     this.$el.html(this.template(this.model.toJSON()));
@@ -14,8 +20,20 @@ var BeerView = Backbone.View.extend({
     return this;
   },
 
-  makeEditable: function () {
-    this.$el.find('.beer-name').
-  }
+  editMode: function () {
+    this.$el.addClass('editing');
+    this.$('.beer-name').focus();
+},
 
+  submitOnEnter: function (e) {
+    if (e.keyCode == 13) {
+      this.model.set({name: this.$('.edit-mode').val()})
+      this.$el.removeClass('editing');
+      this.render()
+  }
+},
+
+  deleteMe: function() {
+    this.model.destroy()
+  }
 });
